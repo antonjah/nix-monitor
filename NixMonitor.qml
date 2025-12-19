@@ -321,34 +321,11 @@ PluginComponent {
                         spacing: Theme.spacingS
                         visible: root.showConsole
 
-                        Row {
-                            width: parent.width
-                            spacing: Theme.spacingS
-
-                            StyledText {
-                                text: "Console Output"
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.weight: Font.Bold
-                                color: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Item {
-                                width: parent.width - clearButton.width - parent.spacing - 150
-                                height: 1
-                            }
-
-                            DankButton {
-                                id: clearButton
-                                text: "Clear"
-                                iconName: "close"
-                                buttonHeight: 30
-                                enabled: !root.operationRunning
-                                onClicked: {
-                                    root.showConsole = false
-                                    root.consoleOutput = ""
-                                }
-                            }
+                        StyledText {
+                            text: "Console Output"
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: Font.Bold
+                            color: Theme.surfaceText
                         }
 
                         StyledRect {
@@ -378,6 +355,18 @@ PluginComponent {
                                         contentY = contentHeight - height
                                     }
                                 }
+                            }
+                        }
+
+                        DankButton {
+                            text: "Clear"
+                            iconName: "close"
+                            buttonHeight: 30
+                            anchors.right: parent.right
+                            enabled: !root.operationRunning
+                            onClicked: {
+                                root.showConsole = false
+                                root.consoleOutput = ""
                             }
                         }
                     }
