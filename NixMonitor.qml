@@ -465,7 +465,7 @@ PluginComponent {
         onExited: function(exitCode, exitStatus) {
             root.isLoading = false
             var now = new Date()
-            root.lastUpdate = now.toLocaleTimeString()
+            root.lastUpdate = Qt.formatTime(now, "HH:mm:ss")
         }
     }
 
