@@ -1,0 +1,20 @@
+# Nix build artifacts
+result
+result-*
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Backup files
+*.bak
+*.backup
+
+# QML cache
+*.qmlc
