@@ -80,7 +80,17 @@ Add to your `flake.nix`:
 5. Toggle "Nix Monitor" ON
 6. Add to your DankBar layout
 
-**Note:** After updating the plugin (via `nix flake update nix-monitor`), you must restart DMS to reload the updated QML files. Run `dms restart` after rebuilding your configuration.
+### Updating
+
+After updating the plugin:
+```bash
+nix flake update nix-monitor
+home-manager switch --flake .#home --impure
+rm -rf ~/.cache/quickshell/qmlcache/
+dms restart
+```
+
+**Note:** Due to QML disk caching with Nix symlinks, you must clear the QML cache after plugin updates for changes to take effect.
 
 ## Usage
 
