@@ -37,33 +37,35 @@ Access via DMS Settings → Plugins → Nix Monitor:
 
 Add to your `flake.nix`:
 
+For NixOS:
 ```nix
 {
   inputs = {
-    dms-nix-monitor = {
-      url = "github:antonjah/nixmonitor";
+    nix-monitor = {
+      url = "github:antonjah/nix-monitor";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, dms-nix-monitor, ... }: {
+  outputs = { self, nixpkgs, home-manager, nix-monitor, ... }: {
     homeConfigurations."youruser" = home-manager.lib.homeManagerConfiguration {
       modules = [
-        dms-nix-monitor.homeManagerModules.default
+        nix-monitor.homeManagerModules.default
         {
           programs.nix-monitor = {
             enable = true;
             
-            # Required: specify your rebuild command
+            # For NixOS:
             rebuildCommand = [ 
               "/usr/bin/bash" "-l" "-c" 
               "sudo nixos-rebuild switch --flake .#hostname 2>&1"
             ];
             
-            # Optional: customize to track home-manager instead
-            # generationsCommand = [ "sh" "-c" "home-manager generations 2>/dev/null | wc -l" ];
-            
-            updateInterval = 300;
+            # Or for home-manager:
+            rebuildCommand = [ 
+              "/usr/bin/bash" "-l" "-c" 
+              "cd ~/.config/home-manager && home-manager switch --flake .#home 2>&1"
+            ];
           };
         }
       ];
@@ -71,6 +73,8 @@ Add to your `flake.nix`:
   };
 }
 ```
+
+
 
 ### Activation
 
