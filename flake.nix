@@ -13,7 +13,7 @@
         }:
         with lib;
         let
-          cfg = config.programs.dms-nix-monitor;
+          cfg = config.programs.nix-monitor;
 
           configFile = pkgs.writeText "nix-monitor-config.json" (
             builtins.toJSON {
@@ -24,8 +24,8 @@
           );
         in
         {
-          options.programs.dms-nix-monitor = {
-            enable = mkEnableOption "DMS Nix Monitor plugin";
+          options.programs.nix-monitor = {
+            enable = mkEnableOption "Nix Monitor plugin for DankMaterialShell";
 
             rebuildCommand = mkOption {
               type = types.listOf types.str;

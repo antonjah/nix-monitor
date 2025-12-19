@@ -49,7 +49,7 @@ Add to your `flake.nix`:
       modules = [
         dms-nix-monitor.homeManagerModules.default
         {
-          programs.dms-nix-monitor = {
+          programs.nix-monitor = {
             enable = true;
             
             updateInterval = 300;
@@ -105,7 +105,7 @@ Add to your `flake.nix`:
 Configure commands in your home-manager flake:
 
 ```nix
-programs.dms-nix-monitor = {
+programs.nix-monitor = {
   enable = true;
   
   updateInterval = 600;
