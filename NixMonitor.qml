@@ -22,6 +22,7 @@ PluginComponent {
     property bool operationRunning: false
     property string consoleOutput: ""
     property bool showConsole: false
+    property string runningOperation: ""
 
     property var config: null
     property var rebuildCommand: ["/usr/bin/bash", "-l", "-c", "cd ~/.config/home-manager && home-manager switch -b backup --impure --flake .#home 2>&1"]
@@ -276,41 +277,58 @@ PluginComponent {
                             color: Theme.surfaceText
                         }
 
-                        Row {
+                        Column {
                             width: parent.width
                             spacing: Theme.spacingS
 
-                            DankButton {
-                                width: (parent.width - Theme.spacingS * 2) / 3
-                                text: "Refresh"
-                                iconName: "refresh"
-                                enabled: !root.isLoading && !root.operationRunning
-                                onClicked: {
-                                    root.refreshData()
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+
+                                DankButton {
+                                    width: (parent.width - Theme.spacingS * 2) / 3
+                                    text: "Refresh"
+                                    iconName: "refresh"
+                                    enabled: !root.isLoading && !root.operationRunning
+                                    onClicked: {
+                                        root.refreshData()
+                                    }
+                                }
+
+                                DankButton {
+                                    width: (parent.width - Theme.spacingS * 2) / 3
+                                    text: root.operationRunning && root.runningOperation === "rebuild" ? "Building..." : "Rebuild"
+                                    iconName: "build"
+                                    backgroundColor: Theme.secondary
+                                    textColor: Theme.onSecondary
+                                    enabled: !root.operationRunning
+                                    onClicked: {
+                                        root.rebuildSystem()
+                                    }
+                                }
+
+                                DankButton {
+                                    width: (parent.width - Theme.spacingS * 2) / 3
+                                    text: root.operationRunning && root.runningOperation === "gc" ? "Running..." : "GC"
+                                    iconName: "cleaning_services"
+                                    backgroundColor: Theme.error
+                                    textColor: Theme.onError
+                                    enabled: !root.operationRunning
+                                    onClicked: {
+                                        root.runGarbageCollect()
+                                    }
                                 }
                             }
 
                             DankButton {
-                                width: (parent.width - Theme.spacingS * 2) / 3
-                                text: root.operationRunning ? "Building..." : "Rebuild"
-                                iconName: "build"
-                                backgroundColor: Theme.secondary
-                                textColor: Theme.onSecondary
-                                enabled: !root.operationRunning
-                                onClicked: {
-                                    root.rebuildSystem()
-                                }
-                            }
-
-                            DankButton {
-                                width: (parent.width - Theme.spacingS * 2) / 3
-                                text: root.operationRunning ? "Running..." : "GC"
-                                iconName: "cleaning_services"
+                                width: parent.width
+                                text: "Cancel Operation"
+                                iconName: "cancel"
                                 backgroundColor: Theme.error
                                 textColor: Theme.onError
-                                enabled: !root.operationRunning
+                                visible: root.operationRunning
                                 onClicked: {
-                                    root.runGarbageCollect()
+                                    root.cancelOperation()
                                 }
                             }
                         }
@@ -449,10 +467,14 @@ PluginComponent {
 
         onExited: function(exitCode, exitStatus) {
             root.operationRunning = false
+            root.runningOperation = ""
             if (exitCode === 0) {
                 root.consoleOutput += "\n✓ System rebuilt successfully\n"
                 ToastService.showInfo("System rebuilt successfully")
                 root.refreshData()
+            } else if (exitCode === 143 || exitCode === 130) {
+                root.consoleOutput += "\n✗ Rebuild cancelled by user\n"
+                ToastService.showInfo("Rebuild cancelled")
             } else {
                 root.consoleOutput += "\n✗ Rebuild failed (exit code: " + exitCode + ")\n"
                 ToastService.showError("Rebuild failed")
@@ -479,10 +501,14 @@ PluginComponent {
 
         onExited: function(exitCode, exitStatus) {
             root.operationRunning = false
+            root.runningOperation = ""
             if (exitCode === 0) {
                 root.consoleOutput += "\n✓ Garbage collection completed\n"
                 ToastService.showInfo("Garbage collection completed")
                 root.refreshData()
+            } else if (exitCode === 143 || exitCode === 130) {
+                root.consoleOutput += "\n✗ GC cancelled by user\n"
+                ToastService.showInfo("GC cancelled")
             } else {
                 root.consoleOutput += "\n✗ GC failed (exit code: " + exitCode + ")\n"
                 ToastService.showError("GC failed")
@@ -500,6 +526,7 @@ PluginComponent {
 
     function rebuildSystem() {
         root.operationRunning = true
+        root.runningOperation = "rebuild"
         root.showConsole = true
         root.consoleOutput = "Starting system rebuild...\n"
         ToastService.showInfo("Starting system rebuild...")
@@ -508,9 +535,21 @@ PluginComponent {
 
     function runGarbageCollect() {
         root.operationRunning = true
+        root.runningOperation = "gc"
         root.showConsole = true
         root.consoleOutput = "Starting garbage collection...\n"
         ToastService.showInfo("Starting garbage collection...")
         garbageCollectProcess.running = true
+    }
+
+    function cancelOperation() {
+        if (root.runningOperation === "rebuild" && rebuildProcess.running) {
+            rebuildProcess.running = false
+            root.consoleOutput += "\n✗ Cancelling rebuild...\n"
+        } else if (root.runningOperation === "gc" && garbageCollectProcess.running) {
+            garbageCollectProcess.running = false
+            root.consoleOutput += "\n✗ Cancelling garbage collection...\n"
+        }
+        ToastService.showInfo("Cancelling operation...")
     }
 }
