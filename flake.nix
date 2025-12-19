@@ -22,15 +22,6 @@
               updateInterval = cfg.updateInterval;
             }
           );
-
-          versionFile = pkgs.writeText "PluginVersion.qml" ''
-            import QtQuick
-
-            QtObject {
-                readonly property string version: "1.0.0"
-                readonly property string buildHash: "${self.rev or "dirty"}"
-            }
-          '';
         in
         {
           options.programs.nix-monitor = {
@@ -80,10 +71,6 @@
 
             home.file.".config/DankMaterialShell/plugins/NixMonitor/config.json" = {
               source = configFile;
-            };
-
-            home.file.".config/DankMaterialShell/plugins/NixMonitor/PluginVersion.qml" = {
-              source = versionFile;
             };
           };
         };

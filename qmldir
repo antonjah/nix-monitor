@@ -1,2 +1,0 @@
-module NixMonitor
-singleton PluginVersion 1.0 PluginVersion.qml
