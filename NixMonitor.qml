@@ -305,7 +305,7 @@ PluginComponent {
                                 }
 
                                 StyledText {
-                                    text: root.isUpToDate ? "NixOS is up to date" : "NixOS update available"
+                                    text: root.isUpToDate ? "Nixpkgs is up to date" : "Nixpkgs update available"
                                     font.pixelSize: Theme.fontSizeMedium
                                     font.weight: Font.Bold
                                     color: Theme.surfaceText
