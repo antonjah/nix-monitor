@@ -1,0 +1,3 @@
+theme: jekyll-theme-minimal
+title: Nix Monitor
+description: A DankMaterialShell plugin for monitoring Nix store disk usage and system generations
